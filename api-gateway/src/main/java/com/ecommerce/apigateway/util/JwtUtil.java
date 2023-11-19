@@ -37,7 +37,7 @@ public class JwtUtil {
     }
     public String extractRole(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
-        return (String) claims.get("role");
+        return claims.get("role").toString();
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
