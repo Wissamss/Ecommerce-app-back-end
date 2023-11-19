@@ -24,6 +24,10 @@ spring:
             - Path=/api/**
           filters:
             - AuthenticationFilter
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/**
 
         - id: identity-service
           uri: lb://identity-service
