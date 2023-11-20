@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class CustomerController {
 
     private final CustomerService customerService;
-    @GetMapping("/users")
+    @GetMapping
     public List<Customer> getAllCustomers() {
         return customerService.getAllCustomers();
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<CustomerResponse> getUserById(@PathVariable Integer id) {
         CustomerResponse user = customerService.getUserById(id);
         return ResponseEntity.ok(user);
@@ -31,7 +31,7 @@ public class CustomerController {
         CustomerResponse user = customerService.getUserById(id);
         return ResponseEntity.ok(user);
     }
-    @PutMapping("/user/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<CustomerResponse> updateUser(@PathVariable Integer id, @RequestBody CustomerRequest customerRequest) {
         CustomerResponse updatedUser = customerService.updateUser(id, customerRequest);
         return ResponseEntity.ok(updatedUser);
@@ -44,7 +44,7 @@ public class CustomerController {
     }
 
 
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Integer id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();

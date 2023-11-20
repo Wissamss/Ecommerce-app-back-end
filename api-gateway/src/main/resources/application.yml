@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8080
 
 eureka:
   client:
@@ -21,13 +21,13 @@ spring:
         - id: customer-service
           uri: lb://customer-service
           predicates:
-            - Path=/api/**
+            - Path=/api/users/**
           filters:
             - AuthenticationFilter
         - id: product-service
           uri: lb://product-service
           predicates:
-            - Path=/api/**
+            - Path=/api/products/**
 
         - id: identity-service
           uri: lb://identity-service
