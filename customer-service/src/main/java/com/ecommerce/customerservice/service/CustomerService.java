@@ -1,10 +1,13 @@
 package com.ecommerce.customerservice.service;
 
+import com.ecommerce.customerservice.dto.CartRequest;
+import com.ecommerce.customerservice.dto.CustomerRequest;
+import com.ecommerce.customerservice.feignClient.CartClient;
 import com.ecommerce.customerservice.model.Customer;
-import com.ecommerce.customerservice.model.CustomerRequest;
-import com.ecommerce.customerservice.model.CustomerResponse;
+import com.ecommerce.customerservice.model.Role;
 import com.ecommerce.customerservice.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,28 +15,37 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
-
     private final CustomerRepository customerRepository;
-   public List<Customer> getAllCustomers() {
+    private final CartClient cartClient;
+
+    public Customer registration(Customer customer) {
+        String password = customer.getPassword();
+        customer.setPassword(new BCryptPasswordEncoder().encode(password));
+        customer.setRole(Role.CUSTOMER);
+        if(customerRepository.findByEmail(customer.getEmail()) != null) {
+            throw new RuntimeException("Username is already taken.");
+        }
+        Customer c = customerRepository.save(customer);
+        cartClient.createCart(new CartRequest(c.getId()));
+        return c;
+    }
+
+    public List<Customer> getAll() {
         return customerRepository.findAll();
     }
 
-    public CustomerResponse getUserById(Integer id) {
-
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
-        return CustomerResponse.builder()
-                .firstName(customer.getFirstName())
-                .lastName(customer.getLastName())
-                .phoneNumber(customer.getPhoneNumber())
-                .address(customer.getAddress())
-                .email(customer.getEmail())
-                .build();
+    public Customer getCustomerById(Long id) {
+        return customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found with ID : " + id));
     }
 
-    public CustomerResponse updateUser(Integer id, CustomerRequest customerRequest) {
+    public Customer getByEmail(String email){
+        return customerRepository.findByEmail(email);
+    }
+
+    public Customer updateUser(Long id, CustomerRequest customerRequest) {
         Customer existingCustomer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Customer not found with ID: " + id));
 
         existingCustomer.setFirstName(customerRequest.getFirstName());
         existingCustomer.setLastName(customerRequest.getLastName());
@@ -41,19 +53,12 @@ public class CustomerService {
         existingCustomer.setPhoneNumber(customerRequest.getPhoneNumber());
         existingCustomer.setEmail(customerRequest.getEmail());
 
-        Customer updatedCustomer = customerRepository.save(existingCustomer);
+        return customerRepository.save(existingCustomer);
 
-       return CustomerResponse.builder()
-               .firstName(updatedCustomer.getFirstName())
-               .lastName(updatedCustomer.getLastName())
-               .address(updatedCustomer.getAddress())
-               .phoneNumber(updatedCustomer.getPhoneNumber())
-               .email(updatedCustomer.getEmail())
-               .build();
     }
 
-    public void deleteCustomer(Integer id) {
+    public void deleteCustomer(Long id) {
         customerRepository.deleteById(id);
     }
-}
 
+}

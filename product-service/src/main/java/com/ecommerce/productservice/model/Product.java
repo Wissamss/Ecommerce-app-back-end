@@ -9,23 +9,25 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-@Table(name="product")
+@Table(name="products")
 public class Product {
 
     @Id
     @GeneratedValue
-    private Integer productId;
+    private Long id;
     private String designation;
-    private int price;
+    private BigDecimal price;
     private String category;
     //private String description;
     //private String image;
-    private int quantity;
+    private Integer quantity;
 
 }
 

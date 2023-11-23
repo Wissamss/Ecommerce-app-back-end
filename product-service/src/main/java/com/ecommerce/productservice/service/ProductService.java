@@ -16,19 +16,19 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public Product getProductById(Integer id) {
-        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product with {id} not found"+id));
+    public Product getProductById(Long id) {
+        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"+id));
     }
 
     public Product addProduct(Product product) {
         return productRepository.save(product);
     }
 
-    public void deleteProduct(Integer id) {
+    public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
 
-    public Product updateProduct(Integer id, Product product){
+    public Product updateProduct(Long id, Product product){
         Product existingProduct = getProductById(id);
         existingProduct.setDesignation(product.getDesignation());
         existingProduct.setPrice(product.getPrice());
