@@ -23,7 +23,7 @@ public class CartItem {
     private Integer quantity = 0;
     private BigDecimal totalPrice = BigDecimal.valueOf(0);
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 

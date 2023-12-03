@@ -5,10 +5,14 @@ import com.ecommerce.productservice.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
+@CrossOrigin
 public class ProductController {
 
     @Autowired
@@ -25,12 +29,23 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+    /*
     @PostMapping
-    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
+    public ResponseEntity<Product> addProduct(@RequestBody Product product){
         Product savedProduct = productService.addProduct(product);
         return ResponseEntity.ok(savedProduct);
     }
 
+     */
+    @PostMapping
+    public ResponseEntity<Product> saveProduct(@RequestParam("file") MultipartFile file,
+                                               @RequestParam("designation") String designation,
+                                               @RequestParam("price") BigDecimal price,
+                                               @RequestParam("category") String category,
+                                               @RequestParam("quantity") Integer quantity){
+        Product savedProduct = productService.saveProduct(file, designation, quantity, price, category);
+        return  ResponseEntity.ok(savedProduct);
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);

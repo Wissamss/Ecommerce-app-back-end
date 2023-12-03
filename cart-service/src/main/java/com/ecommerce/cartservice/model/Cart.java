@@ -24,7 +24,7 @@ public class Cart {
     @Column(name = "customer_id", nullable = false)
     private Long customerId;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart")
     private List<CartItem> cartItems;
 
     public void addItem(CartItem cartItem) {

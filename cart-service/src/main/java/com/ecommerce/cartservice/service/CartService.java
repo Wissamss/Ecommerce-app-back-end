@@ -65,8 +65,6 @@ public class CartService {
        return cartRepository.save(cart);
     }
 
-
-
     public Cart removeItem(Long cartId, Long itemId) {
         Cart cart = getById(cartId);
         cart.removeItem(itemId);
