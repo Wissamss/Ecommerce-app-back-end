@@ -7,7 +7,8 @@ docker-login:
     DOCKER_TLS_CERTDIR: "/certs"
   script:
     - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD
-    - export DOCKER_CONFIG=/root/.docker
+    - cat $DOCKER_CONFIG/config.json
+
 
 maven-build:
   stage: build
