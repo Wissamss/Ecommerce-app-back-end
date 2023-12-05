@@ -156,3 +156,9 @@ services:
       - api-gateway
       - discovery-server
       - customer-service
+
+  ui-service:
+    container_name: ui-service
+    image: wissamsaidi/ui-service:latest
+    ports:
+      - '3000:3000'
