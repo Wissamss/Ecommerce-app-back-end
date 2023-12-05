@@ -1,0 +1,158 @@
+services:
+  mysql-customer:
+    restart: always
+    container_name: mysql-customer
+    image: 'mysql:latest'
+    env_file:
+      - .env
+    environment:
+      - MYSQL_DATABASE=customer-service
+    ports:
+        - '3307:3306'
+    volumes:
+        - ./mysql-customer:/var/lib/mysql
+
+  mysql-product:
+    restart: always
+    container_name: mysql-product
+    image: 'mysql:latest'
+    env_file:
+      - .env
+    environment:
+      - MYSQL_DATABASE=product-service
+    ports:
+      - '3308:3306'
+    volumes:
+      - ./mysql-product:/var/lib/mysql
+
+  mysql-cart:
+    restart: always
+    container_name: mysql-cart
+    image: 'mysql:latest'
+    env_file:
+      - .env
+    environment:
+      - MYSQL_DATABASE=cart-service
+    ports:
+      - '3309:3306'
+    volumes:
+      - ./mysql-cart:/var/lib/mysql
+
+  mysql-order:
+    restart: always
+    container_name: mysql-order
+    image: 'mysql:latest'
+    env_file:
+      - .env
+    environment:
+      - MYSQL_DATABASE=order-service
+    ports:
+      - '3310:3306'
+    volumes:
+      - ./mysql-order:/var/lib/mysql
+
+  discovery-server:
+    image: wissamsaidi/discovery-server:latest
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+
+  api-gateway:
+      image: wissamsaidi/api-gateway:latest
+      container_name: api-gateway
+      ports:
+        - "8080:8080"
+      environment:
+        - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY= TRACE
+        - eureka.client.service-url.defaultZone=http://discovery-server:8761/eureka
+        - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
+      depends_on:
+        - discovery-server
+        - config-service
+
+  product-service:
+      container_name: product-service
+      image: wissamsaidi/product-service:latest
+      ports:
+        - "8085:8080"
+      environment:
+        - eureka.client.service-url.defaultZone=http://discovery-server:8761/eureka
+        - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-product:3306/product-service
+        - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+        - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+        - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      depends_on:
+        - mysql-product
+        - discovery-server
+
+  order-service:
+    container_name: order-service
+    image: wissamsaidi/order-service:latest
+    ports:
+      - "8084:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-order:3306/order-service
+      - eureka.client.service-url.defaultZone=http://discovery-server:8761/eureka
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - mysql-order
+      - discovery-server
+      - product-service
+
+  customer-service:
+    container_name: customer-service
+    image: wissamsaidi/customer-service:latest
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-customer:3306/customer-service
+      - eureka.client.service-url.defaultZone=http://discovery-server:8761/eureka
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - mysql-customer
+      - discovery-server
+      - cart-service
+
+  cart-service:
+    container_name: cart-service
+    image: wissamsaidi/cart-service:latest
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-cart:3306/cart-service
+      - eureka.client.service-url.defaultZone=http://discovery-server:8761/eureka
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - mysql-cart
+      - discovery-server
+      - api-gateway
+      - product-service
+      - order-service
+
+  config-service:
+    container_name: config-service
+    image: wissamsaidi/config-service:latest
+    ports:
+      - "8888:8888"
+    environment:
+      - eureka.client.service-url.defaultZone=http://discovery-server:8761/eureka
+    depends_on:
+      - discovery-server
+
+  auth-service:
+    container_name: auth-service
+    image: wissamsaidi/auth-service:latest
+    ports:
+      - "8081:8080"
+    environment:
+      - eureka.client.service-url.defaultZone=http://discovery-server:8761/eureka
+    depends_on:
+      - api-gateway
+      - discovery-server
+      - customer-service
