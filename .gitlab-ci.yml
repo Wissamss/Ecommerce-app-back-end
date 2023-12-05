@@ -3,11 +3,13 @@ stages:
 
 variables:
   MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
-  DOCKER_USERNAME: $REGISTRY_USER
-  DOCKER_PASSWORD: $REGISTRY_PASSWORD
 
 build:
   stage: build
   image: maven:3.8.4-openjdk-17
   script:
-    - mvn $MAVEN_CLI_OPTS clean install jib:build -Dimage=$IMAGE_NAME:$IMAGE_TAG
+    - mkdir -p $HOME/.docker
+    - echo "$DOCKER_CONFIG_YML" > $HOME/.docker/config.yml
+    - mvn $MAVEN_CLI_OPTS clean install jib:build
+
+
