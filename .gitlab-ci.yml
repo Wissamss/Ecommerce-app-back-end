@@ -9,6 +9,7 @@ docker-login:
     - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD
     - export DOCKER_CONFIG=/root/.docker
     - cat $DOCKER_CONFIG/config.json
+    - cp $DOCKER_CONFIG/config.json /root/.docker/config.yml
 
 
 maven-build:
