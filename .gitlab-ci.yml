@@ -5,7 +5,7 @@ build:
   image: maven:3.8.4-openjdk-17
   script:
     - mkdir -p $HOME/.docker
-    - echo "$DOCKER_CONFIG_YML" > $HOME/.docker/config.yml
+    - echo "$DOCKER_CONFIG_JSON" > $HOME/.docker/config.json
     - mvn clean install jib:build
 
 
