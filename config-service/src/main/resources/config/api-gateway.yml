@@ -17,8 +17,15 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
       routes:
-
         - id: customer-service
           uri: lb://customer-service
           predicates:
@@ -42,7 +49,7 @@ spring:
         - id: cart-service
           uri: lb://cart-service
           predicates:
-            - Path=/api/carts/**
+            - Path=/api/cart/**
 
         - id: discovery-server
           uri: http://localhost:8761
